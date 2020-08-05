@@ -24,16 +24,33 @@ public class SocketIOPropertites {
     private static final int RECEIVE_BUFFER = 10;
     private static final int SO_TIMEOUT = 0;
     private static final boolean REUSE_ADDR = false;
+
+    //当服务起来以后，很多连接过来，线程不够，排队的数量；超过的全部拒绝
     private static final int BACK_LOG = 2;
+
     //client socket listen property on server endpoint:
+    //keepalive的心跳是否代表长连接
     private static final boolean CLI_KEEPALIVE = false;
+
+    //是否优先发一个字符过去试探一下
     private static final boolean CLI_OOB = false;
+
+    //receive-Q和send-Q跟REC_BUF的关系
     private static final int CLI_REC_BUF = 20;
+
+    //是否重用地址
     private static final boolean CLI_REUSE_ADDR = false;
     private static final int CLI_SEND_BUF = 20;
+
+    //断开连接的速度
     private static final boolean CLI_LINGER = true;
     private static final int CLI_LINGER_N = 0;
+
+    //客户端读取数据的时候，超时时间，超过设置时间抛异常，做其他处理
     private static final int CLI_TIMEOUT = 0;
+
+    //TCP的一个优化算法，当发送数据比较少的时候，可以利用缓冲的概念；是否开启对于业务数据量的大小，业务规模、业务特征是有关系的
+    //默认为false，不优化；负负得正，优化：当发送的数据量小的时候，积攒一下，再发送
     private static final boolean CLI_NO_DELAY = false;
 /*
 
@@ -63,9 +80,13 @@ public class SocketIOPropertites {
         System.out.println("server up use 9090!");
         while (true) {
             try {
-                System.in.read();  //分水岭：
+                //分水岭；上面只是得到了Server；
+                // 在Socket.accept之前，TCP的三次握手能不能走通和TCP什么关系？内核是否开辟资源？
+                // 有没有队列在客户端没有接受连接的情况下，客户端就能发数据了；接受数据之后，把数据处理了？
 
-                Socket client = server.accept();
+                System.in.read(); // 分水岭
+
+                Socket client = server.accept(); // 阻塞的，没有返回-1的可能性，一直卡着不动  通过查看out.txt文件可以看到accept(4,
                 System.out.println("client port: " + client.getPort());
 
                 client.setKeepAlive(CLI_KEEPALIVE);
