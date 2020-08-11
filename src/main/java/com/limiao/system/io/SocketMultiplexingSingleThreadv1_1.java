@@ -11,15 +11,15 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class SocketMultiplexingSingleThreadv1_1 {
-
+    //预习可以看马老师的坦克 一期
     private ServerSocketChannel server = null;
-    private Selector selector = null;   //linux 多路复用器（select poll epoll） nginx  event{}
+    private Selector selector = null;   //linux 多路复用器（select poll   epoll kqueue） nginx  event{}
     int port = 9090;
 
     public void initServer() {
         try {
             server = ServerSocketChannel.open();
-            server.configureBlocking(false);
+            server.configureBlocking(false); //非阻塞
             server.bind(new InetSocketAddress(port));
             selector = Selector.open();  //  select  poll  *epoll
             server.register(selector, SelectionKey.OP_ACCEPT);
