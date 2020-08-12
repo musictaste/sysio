@@ -13,6 +13,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 多线程
+ * 有多个线程，一个线程中有一个Selector
+ * 一个线程中，selector.select()线性执行读写事件
+ * 保证了多核多个Selector这种淳朴的执行效果
+ */
 public class SocketMultiplexingThreads {
 
     private ServerSocketChannel server = null;

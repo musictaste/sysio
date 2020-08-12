@@ -8,6 +8,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 单线程--线性执行
+ * 只有读事件
+ */
 public class SocketMultiplexingSingleThreadv1 {
 
     //预习看马老师的坦克 一期
@@ -37,7 +41,7 @@ public class SocketMultiplexingSingleThreadv1 {
             epoll：  epoll_ctl(fd3,ADD,fd4,EPOLLIN
              */
             server.register(selector, SelectionKey.OP_ACCEPT);
-
+            System.out.println("register listern over ~~~");
 
         } catch (IOException e) {
             e.printStackTrace();

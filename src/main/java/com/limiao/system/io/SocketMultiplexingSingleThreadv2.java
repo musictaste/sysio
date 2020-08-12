@@ -10,6 +10,10 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 单线程-线性执行
+ * 读写事件--另一个线程执行
+ */
 public class SocketMultiplexingSingleThreadv2 {
 
     private ServerSocketChannel server = null;
@@ -40,7 +44,7 @@ public class SocketMultiplexingSingleThreadv2 {
                     Iterator<SelectionKey> iter = selectionKeys.iterator();
                     while (iter.hasNext()) {
                         SelectionKey key = iter.next();
-                        iter.remove();
+                        iter.remove();//只是从  返回事件的那个结果集 中删除了，不是把内核中的文件描述符删除了
                         if (key.isAcceptable()) {
                             acceptHandler(key);
                         } else if (key.isReadable()) {
@@ -48,19 +52,18 @@ public class SocketMultiplexingSingleThreadv2 {
                             System.out.println("in.....");
                             key.interestOps(key.interestOps() | ~SelectionKey.OP_READ);
 
-                            readHandler(key);//还是阻塞的嘛？ 即便以抛出了线程去读取，但是在时差里，这个key的read事件会被重复触发
+                            readHandler(key);//还是阻塞的嘛？不阻塞了； 即便以抛出了线程去读取，但是在时差里，这个key的read事件会被重复触发
 
                         } else if(key.isWritable()){  //我之前没讲过写的事件！！！！！
-                            //写事件<--  send-queue  只要是空的，就一定会给你返回可以写的事件，就会回调我们的写方法
-                            //你真的要明白：什么时候写？不是依赖send-queue是不是有空间
+                            //写事件<--  send-queue  只要是空的，就一定会给你返回可以写的事件，有事件就会回调我们的写方法
+                            //通过netstap -natp 可以看到Send-Q (也就是Send-queue)
+                            //你真的要明白：你想什么时候写？不是依赖send-queue是不是有空间（多路复用器能不能写是参考send-queue有没有空间）
                             //1，你准备好要写什么了，这是第一步
                             //2，第二步你才关心send-queue是否有空间
-                            //3，so，读 read 一开始就要注册，但是write依赖以上关系，什么时候用什么时候注册
+                            //3，so，读 read 一开始就要注册，但是write依赖以上关系(第一、二步)，什么时候用什么时候注册
                             //4，如果一开始就注册了write的事件，进入死循环，一直调起！！！
 //                            key.cancel();
                             key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-
-
 
                             writeHandler(key);
                         }

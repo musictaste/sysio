@@ -10,6 +10,10 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 单线程-线性执行
+ * 有读、写事件
+ */
 public class SocketMultiplexingSingleThreadv1_1 {
     //预习可以看马老师的坦克 一期
     private ServerSocketChannel server = null;
@@ -123,7 +127,7 @@ public class SocketMultiplexingSingleThreadv1_1 {
                     read = client.read(buffer);
                     if (read > 0) {
                         client.register(key.selector(),SelectionKey.OP_WRITE,buffer);
-                        //关心  OP_WRITE 其实就是关系send-queue是不是有空间
+                        //关心  OP_WRITE 其实就是关心send-queue是不是有空间
                     } else if (read == 0) {
                         break;
                     } else {
